@@ -1,5 +1,7 @@
 import express from 'express';
 import { protect, isAdmin } from '../../middlewares/authMiddleware.js';
+import { storage } from '../../config/cloudinary.js';
+import multer from 'multer';
 
 import {
     createProduct,
@@ -14,11 +16,13 @@ import {
 
 const router = express.Router();
 
+const upload = multer ({ storage })
+
 // Prueba de proteccion de rutas
-router.post('/', protect, createProduct);
+router.post('/', upload.single('image'), protect, createProduct);
 router.get('/', protect, getProducts);
 router.get('/:id', protect, isAdmin, getProductById);
-router.put('/:id', protect, isAdmin, updateProduct);
+router.put('/:id', upload.single('image'), protect, isAdmin, updateProduct);
 router.delete('/:id', protect, isAdmin, deleteProduct);
 router.patch('/deactivate/:id', protect, isAdmin, deactivateProduct);
 router.patch('/activate/:id', protect, isAdmin, activateProduct);

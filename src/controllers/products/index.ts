@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import Product from '../../models/product.js';
-// import cloudinary from '../../config/cloudinary.js';
+import {cloudinary} from '../../config/cloudinary.js';
 
 const createProduct = async (req: Request, res: Response) => {
     try {
@@ -95,9 +95,9 @@ const deleteProduct = async (req: Request, res: Response) => {
             })
         }
 
-        // if (product.image?.public_id) {
-        //     await cloudinary.uploader.destroy(product.image.public_id); // Elimina la imagen de Cloudinary
-        // }
+        if (product.image?.public_id) {
+            await cloudinary.uploader.destroy(product.image.public_id); // Elimina la imagen de Cloudinary
+        }
 
         await Product.findByIdAndDelete(id);
 

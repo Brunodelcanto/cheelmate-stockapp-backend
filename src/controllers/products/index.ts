@@ -150,19 +150,19 @@ const updateProduct = async (req: Request, res: Response) => {
             updateData.variants = typeof variants === 'string' ? JSON.parse(variants) : variants;
         }
 
-        if (req.file) {
+        // if (req.file) {
 
-            // Si el producto ya tiene una imagen, eliminamos la imagen anterior de Cloudinary
-            if (productToUpdate.image?.public_id) {
-                await cloudinary.uploader.destroy(productToUpdate.image.public_id);
-            }
+        //     // Si el producto ya tiene una imagen, eliminamos la imagen anterior de Cloudinary
+        //     if (productToUpdate.image?.public_id) {
+        //         await cloudinary.uploader.destroy(productToUpdate.image.public_id);
+        //     }
 
-            // Agregamos la nueva imagen al objeto de actualización
-            updateData.image = {
-                url: (req.file as any).path || (req.file as any).secure_url,
-                public_id: (req.file as any).filename || (req.file as any).public_id,
-            }
-        }
+        //     // Agregamos la nueva imagen al objeto de actualización
+        //     updateData.image = {
+        //         url: (req.file as any).path || (req.file as any).secure_url,
+        //         public_id: (req.file as any).filename || (req.file as any).public_id,
+        //     }
+        // }
 
         const updatedProduct = await Product.findByIdAndUpdate(
             id,

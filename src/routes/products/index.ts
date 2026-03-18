@@ -1,4 +1,5 @@
 import express from 'express';
+import { protect, isAdmin } from '../../middlewares/authMiddleware.js';
 
 import {
     createProduct,
@@ -13,13 +14,14 @@ import {
 
 const router = express.Router();
 
-router.post('/', createProduct);
-router.get('/', getProducts);
-router.get('/:id', getProductById);
-router.put('/:id', updateProduct);
-router.delete('/:id', deleteProduct);
-router.patch('/deactivate/:id', deactivateProduct);
-router.patch('/activate/:id', activateProduct);
-router.patch('/update-stock/:id', updateVariantStock);
+// Prueba de proteccion de rutas
+router.post('/', protect, createProduct);
+router.get('/', protect, getProducts);
+router.get('/:id', protect, isAdmin, getProductById);
+router.put('/:id', protect, isAdmin, updateProduct);
+router.delete('/:id', protect, isAdmin, deleteProduct);
+router.patch('/deactivate/:id', protect, isAdmin, deactivateProduct);
+router.patch('/activate/:id', protect, isAdmin, activateProduct);
+router.patch('/update-stock/:id', protect, isAdmin, updateVariantStock);
 
 export default router;

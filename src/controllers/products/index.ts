@@ -16,8 +16,34 @@ const createProduct = async (req: Request, res: Response) => {
                 error: true,
             }) 
         }
+
+        if (!req.file) {
+            return res.status(400).json({
+                message: "La imagen del producto es obligatoria",
+                error: true,
+            })
+        }
+
+        let variantsData;
+        try {
+        variantsData = typeof req.body.variants === 'string' 
+        ? JSON.parse(req.body.variants) 
+        : req.body.variants;
+        } catch (e) {
+        return res.status(400).json({ message: "El formato de las variantes es inválido" });
+        }
+
+        const productData = {
+            ...req.body,
+            variants: variantsData, 
+            image: {
+            url: req.file.path,
+             public_id: req.file.filename
+            }   
+        };
+
         // Si no existe, creamos el nuevo producto
-        const product = new Product(req.body);
+        const product = new Product(productData);
         // Guardamos el producto en la base de datos
         await product.save();
 

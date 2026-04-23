@@ -32,7 +32,7 @@ const SaleSchema = new Schema<Sale>(
         ],
         totalAmount: { type: Number, required: true},
         totalProfit: { type: Number, required: true },
-        customerName: { type: String, required: true, trim: true },
+        customerName: { type: String, trim: true },
         comment: { type: String, trim: true }
     },
     {

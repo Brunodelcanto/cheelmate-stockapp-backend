@@ -1,6 +1,7 @@
 import mongoose, {Schema, Document, Types} from 'mongoose';
 
 interface ColorVariant {
+    _id: Types.ObjectId;
     color: Types.ObjectId; // Referencia al Color
     amount: number; 
     priceCost: number;
@@ -25,6 +26,7 @@ const ProductSchema = new Schema<Product>(
         name: { type: String, required: true, unique: true, trim: true },
         category: { type: Schema.Types.ObjectId, ref: 'Category', required: true},
         variants: [{
+            _id: { type: Schema.Types.ObjectId, required: true },
             color: { type: Schema.Types.ObjectId, ref: 'Color', required: true },
             amount: { type: Number, required: true, min: 0 },
             priceCost: { type: Number, required: true, min: 0 },

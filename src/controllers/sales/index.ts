@@ -30,7 +30,7 @@ const createSale = async (req: Request, res: Response) => {
                     error: true
                 })   
             }
-            const variant = product?.variants.find(v => v.color.toString() === item.variantId);
+            const variant = product?.variants.find(v => v._id.toString() === item.variantId);;
 
             // Validar stock
             if (!variant || variant.amount < item.quantity) {
@@ -50,7 +50,7 @@ const createSale = async (req: Request, res: Response) => {
             // Preparamos el item para el historico de la venta
             saleItems.push({
                 productId: product._id,
-                variantId: variant.color,
+                variantId: variant._id,
                 name: product.name,
                 quantity: item.quantity,
                 priceAtSale: itemPrice,

@@ -54,10 +54,16 @@ const createProduct = async (req: Request, res: Response) => {
         });
 
     } catch (error: any) {
+        // Logueamos en la consola de Node para que lo veas ahí
+        console.error("Fallo real detectado en el backend:", error);
+
+        // Retornamos todo el objeto de error al frontend para ver la traza en la respuesta
         return res.status(500).json({
             message: "Error al crear el producto",
             error: error.message,
-        })
+            stack: error.stack, // <-- Esto te va a decir la línea exacta y el archivo del backend que falló
+            innerError: error
+        });
     }
 }
 

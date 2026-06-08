@@ -30,6 +30,11 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+if (process.env.NODE_ENV === 'production') {
+    console.log = () => {};
+    console.debug = () => {};
+}
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -37,5 +42,5 @@ app.use(cookieParser());
 app.use('/api', routes);
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Servidor corriendo en el puerto ${PORT}`);
 });

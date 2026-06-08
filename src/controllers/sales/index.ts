@@ -6,71 +6,94 @@ const createSale = async (req: Request, res: Response) => {
     try {
         const { items, customerName, comment } = req.body;
 
-        // Validaciones iniciales
         if (!items || items.length === 0) {
             return res.status(400).json({
                 message: 'No hay productos en la venta',
                 error: true
-            })
+            });
         }
 
         let totalAmount = 0;
         let totalProfit = 0;
         const saleItems = [];
-
-        // Procesar cada item del carrito
+        
+        const productCache: Record<string, any> = {};
 
         for (const item of items) {
-            const product = await Product.findById(item.productId);
+            if (!productCache[item.productId]) {
+                productCache[item.productId] = await Product.findById(item.productId);
+            }
+            
+            const product = productCache[item.productId];
 
-            // Validar existencia del producto y variante
             if (!product) {
                 return res.status(404).json({
                     message: `Producto ${item.productId} no encontrado`,
                     error: true
-                })   
+                });
             }
-            const variant = product?.variants.find(v => v._id.toString() === item.variantId);;
 
-            // Validar stock
-            if (!variant || variant.amount < item.quantity) {
+            const targetColorId = item.variantId.includes('-') 
+                ? item.variantId.split('-')[1] 
+                : item.variantId;
+
+            const variant = product.variants.find((v: any) => {
+                const variantColorId = v.color && typeof v.color === 'object' && '_id' in v.color
+                    ? v.color._id.toString()
+                    : v.color.toString();
+
+                const variantSubId = v._id ? v._id.toString() : null;
+
+                return variantColorId === targetColorId || variantSubId === targetColorId;
+            });
+
+            if (!variant) {
                 return res.status(400).json({
-                    message: `Stock insuficiente para ${product.name}`,
+                    message: `Variante no encontrada para el producto ${product.name}`,
                     error: true
-                })
+                });
             }
 
-            // Calculamos totales con los precios del momento
+            if (variant.amount < item.quantity) {
+                return res.status(400).json({
+                    message: `Stock insuficiente para ${product.name} (Disponibles: ${variant.amount})`,
+                    error: true
+                });
+            }
+
             const itemPrice = variant.priceSell;
             const itemCost = variant.priceCost;
 
             totalAmount += itemPrice * item.quantity;
             totalProfit += (itemPrice - itemCost) * item.quantity;
 
-            // Preparamos el item para el historico de la venta
+            const originalVariantId = variant._id ? variant._id : variant.color;
+
             saleItems.push({
                 productId: product._id,
-                variantId: variant._id,
+                variantId: originalVariantId,
                 name: product.name,
                 quantity: item.quantity,
                 priceAtSale: itemPrice,
                 priceCostAtSale: itemCost
             });
 
-            // Descontamos el stock
             variant.amount -= item.quantity;
-            await product.save();
         }
 
-        // Guardamos la venta definitiva
+        const savePromises = Object.values(productCache).map(productInstance => {
+            productInstance.markModified('variants'); 
+            return productInstance.save();
+        });
+        await Promise.all(savePromises);
 
-        const newSale = new Sale ({
+        const newSale = new Sale({
             items: saleItems,
             totalAmount,
             totalProfit,
             customerName,
             comment
-        })
+        });
 
         await newSale.save();
 
@@ -81,12 +104,13 @@ const createSale = async (req: Request, res: Response) => {
         });
 
     } catch (error: any) {
+        console.error("Error crítico en createSale backend:", error);
         return res.status(500).json({
             message: "Error al procesar la venta",
             error: error.message
         });
     }
-}
+};
 
 const getSales = async (req: Request, res: Response) => {
     try {

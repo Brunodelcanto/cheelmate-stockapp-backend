@@ -23,9 +23,21 @@ app.use(helmet({
   },
 }));
 
+const allowedOrigins = [
+    'https://cheelmate-stockapp-frontend.vercel.app', 
+    'http://localhost:5173'                           
+];
+
 app.use(cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173", 
-    credentials: true,               
+    origin: (origin, callback) => {
+        // Permitimos peticiones sin origen (como Postman o apps móviles) o las que estén en la whitelist
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Bloqueado por políticas de CORS de Ché, el mate'));
+        }
+    },
+    credentials: true,              
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));

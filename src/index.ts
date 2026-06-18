@@ -14,6 +14,24 @@ app.set('trust proxy', 1);
 
 connectDB();
 
+const allowedOrigins = [
+    'https://cheelmate-stockapp-frontend.vercel.app', 
+    'http://localhost:5173'                           
+];
+
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Bloqueado por políticas de CORS'));
+        }
+    },
+    credentials: true,              
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -21,19 +39,12 @@ app.use(helmet({
       "img-src": ["'self'", "data:", "res.cloudinary.com"], 
     },
   },
+
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" }
 }));
 
-const allowedOrigins = [
-    'https://cheelmate-stockapp-frontend.vercel.app', 
-    'http://localhost:5173'                           
-];
 
-app.use(cors({
-    origin: true,
-    credentials: true,              
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
 
 if (process.env.NODE_ENV === 'production') {
     console.log = () => {};

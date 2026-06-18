@@ -12,20 +12,6 @@ const PORT = process.env.PORT || 3000;
 
 app.set('trust proxy', 1);
 
-connectDB();
-
-// const allowedOrigins = [
-//     'https://cheelmate-stockapp-frontend.vercel.app', 
-//     'http://localhost:5173'                           
-// ];
-
-app.use(cors({
-    origin: true,
-    credentials: true,              
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -33,21 +19,19 @@ app.use(helmet({
       "img-src": ["'self'", "data:", "res.cloudinary.com"], 
     },
   },
-
-  crossOriginResourcePolicy: { policy: "cross-origin" },
-  crossOriginOpenerPolicy: { policy: "same-origin-allow-popups" }
 }));
 
-
-
-if (process.env.NODE_ENV === 'production') {
-    console.log = () => {};
-    console.debug = () => {};
-}
+app.use(cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:5173", 
+    credentials: true,               
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 app.use(express.json());
 app.use(cookieParser());
 
+connectDB();
 
 app.use('/api', routes);
 

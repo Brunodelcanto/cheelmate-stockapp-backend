@@ -14,19 +14,13 @@ app.set('trust proxy', 1);
 
 connectDB();
 
-const allowedOrigins = [
-    'https://cheelmate-stockapp-frontend.vercel.app', 
-    'http://localhost:5173'                           
-];
+// const allowedOrigins = [
+//     'https://cheelmate-stockapp-frontend.vercel.app', 
+//     'http://localhost:5173'                           
+// ];
 
 app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(new Error('Bloqueado por políticas de CORS'));
-        }
-    },
+    origin: true,
     credentials: true,              
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization']

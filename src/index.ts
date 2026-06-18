@@ -29,14 +29,7 @@ const allowedOrigins = [
 ];
 
 app.use(cors({
-    origin: (origin, callback) => {
-        // Permitimos peticiones sin origen (como Postman o apps móviles) o las que estén en la whitelist
-        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(new Error('Bloqueado por políticas de CORS de Ché, el mate'));
-        }
-    },
+    origin: true,
     credentials: true,              
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization']
